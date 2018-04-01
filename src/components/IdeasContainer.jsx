@@ -7,7 +7,7 @@ import IdeaForm from './IdeaForm';
 export default class IdeasContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = { ideas: [], editingIdeaId: null };
+    this.state = { ideas: [], editingIdeaId: null, notification: '' };
   }
 
   componentDidMount() {
@@ -30,19 +30,31 @@ export default class IdeasContainer extends Component {
           ideas,
           editingIdeaId: response.data.id
         });
-
-        // const idea = response.data;
-        // this.setState((prevState) => ({ideas: prevState.ideas.concat(idea)}))
-
-        console.log(response);
       })
       .catch(err => console.log(err));
+  };
+
+  updateIdea = idea => {
+    const ideaIndex = this.state.ideas.findIndex(x => x.id === idea.id);
+    const ideas = update(this.state.ideas, { [ideaIndex]: { $set: idea } });
+    this.setState({ ideas, notification: 'All changes saved' });
+  };
+
+  resetNotification = () => {
+    this.setState({ notification: '' });
   };
 
   render() {
     const ideas = this.state.ideas.map(idea => {
       if (this.state.editingIdeaId === idea.id) {
-        return <IdeaForm idea={idea} key={idea.id} />;
+        return (
+          <IdeaForm
+            idea={idea}
+            key={idea.id}
+            updateIdea={this.updateIdea}
+            resetNotification={this.resetNotification}
+          />
+        );
       }
       return <Idea idea={idea} key={idea.id} />;
     });
@@ -51,6 +63,7 @@ export default class IdeasContainer extends Component {
         <button onClick={this.addNewIdea} className="new-idea-button">
           New Note
         </button>
+        <span>{this.state.notification}</span>
         <div>{ideas}</div>
       </div>
     );

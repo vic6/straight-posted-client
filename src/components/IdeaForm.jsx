@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+// import update from 'immutability-helper';
 
 export default class IdeaForm extends Component {
   state = {
@@ -8,6 +9,7 @@ export default class IdeaForm extends Component {
   };
 
   handleInput = e => {
+    this.props.resetNotification();
     this.setState({ [e.target.name]: e.target.value });
   };
 
@@ -19,6 +21,7 @@ export default class IdeaForm extends Component {
     axios
       .put(`http://localhost:3001/api/v1/ideas/${this.props.idea.id}`, { idea })
       .then(response => {
+        this.props.updateIdea(response.data)
         console.log(response);
       })
       .catch(error => console.log(error));
