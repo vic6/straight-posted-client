@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import update from 'immutability-helper';
 import Idea from './Idea';
+import IdeaForm from './IdeaForm';
 
 export default class IdeasContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = { ideas: [] };
+    this.state = { ideas: [], editingIdeaId: null };
   }
 
   componentDidMount() {
@@ -25,19 +26,26 @@ export default class IdeasContainer extends Component {
         const ideas = update(this.state.ideas, {
           $splice: [[0, 0, response.data]]
         });
-        this.setState({ideas});
-        // this.setState((prevState) => {
-        //   return { ideas: [...prevState.concat, response.data] };
-        // });
+        this.setState({
+          ideas,
+          editingIdeaId: response.data.id
+        });
+
+        // const idea = response.data;
+        // this.setState((prevState) => ({ideas: prevState.ideas.concat(idea)}))
 
         console.log(response);
       })
       .catch(err => console.log(err));
-  }
-
+  };
 
   render() {
-    const ideas = this.state.ideas.map(idea => <Idea idea={idea} key={idea.id} />);
+    const ideas = this.state.ideas.map(idea => {
+      if (this.state.editingIdeaId === idea.id) {
+        return <IdeaForm idea={idea} key={idea.id} />;
+      }
+      return <Idea idea={idea} key={idea.id} />;
+    });
     return (
       <div>
         <button onClick={this.addNewIdea} className="new-idea-button">
