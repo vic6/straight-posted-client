@@ -19,25 +19,11 @@ export default class IdeasContainer extends Component {
       .catch(err => console.log(err));
   }
 
-  addNewIdea = () => {
-    axios
-      .post('http://localhost:3001/api/v1/ideas', { idea: { title: '', body: '' } })
-      .then(response => {
-        const ideas = update(this.state.ideas, {
-          $splice: [[0, 0, response.data]]
-        });
-        this.setState({
-          ideas,
-          editingIdeaId: response.data.id
-        });
-      })
-      .catch(err => console.log(err));
-  };
 
   enableEditing = id => {
-    this.setState({ editingIdeaId: id },
-      () => { this.title.focus()}
-    );
+    this.setState({ editingIdeaId: id }, () => {
+      this.title.focus();
+    });
   };
 
   updateIdea = idea => {
@@ -46,10 +32,32 @@ export default class IdeasContainer extends Component {
     this.setState({ ideas, notification: 'All changes saved' });
   };
 
-  deleteIdea = (id) => {
-    
-  }
+  deleteIdea = id => {
+    console.log('hi')
+    axios
+      .delete(`http://localhost:3001/api/v1/ideas/${id}`)
+      .then(() => {
+        const ideaIndex = this.state.ideas.findIndex(x => x.id === id);
+        const ideas = update(this.state.ideas, { $splice: [[ideaIndex, 1]] });
+        this.setState({ ideas });
+      })
+      .catch(error => console.log(error));
+  };
 
+  addNewIdea = () => {
+    axios
+    .post('http://localhost:3001/api/v1/ideas', { idea: { title: '', body: '' } })
+    .then(response => {
+      const ideas = update(this.state.ideas, {
+        $splice: [[0, 0, response.data]]
+      });
+      this.setState({
+        ideas,
+        editingIdeaId: response.data.id
+      });
+    })
+    .catch(err => console.log(err));
+  };
   resetNotification = () => {
     this.setState({ notification: '' });
   };
@@ -62,12 +70,19 @@ export default class IdeasContainer extends Component {
             idea={idea}
             key={idea.id}
             updateIdea={this.updateIdea}
-            titleRef={input => this.title = input}
+            titleRef={input => (this.title = input)}
             resetNotification={this.resetNotification}
           />
         );
       }
-      return <Idea idea={idea} key={idea.id} enableEditing={this.enableEditing} />;
+      return (
+        <Idea
+          idea={idea}
+          key={idea.id}
+          enableEditing={this.enableEditing}
+          onDelete={this.deleteIdea}
+        />
+      );
     });
     return (
       <div>
