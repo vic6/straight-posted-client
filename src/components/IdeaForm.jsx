@@ -13,7 +13,7 @@ export default class IdeaForm extends Component {
     this.setState({ [e.target.name]: e.target.value });
   };
 
-  handleBlur = () => {
+  updateValueOnBlur = () => {
     const idea = {
       title: this.state.title,
       body: this.state.body
@@ -33,16 +33,17 @@ export default class IdeaForm extends Component {
         <form>
           <input
             onChange={this.handleInput}
-            onBlur={this.handleBlur}
+            onBlur={this.updateValueOnBlur}
             className="input"
             type="text"
             name="title"
             placeholder="Enter a title"
             value={this.state.title}
+            ref={this.props.titleRef}
           />
           <textarea
             onChange={this.handleInput}
-            onBlur={this.handleBlur}
+            onBlur={this.updateValueOnBlur}
             className="input"
             name="body"
             placeholder="Enter your idea"

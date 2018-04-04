@@ -34,11 +34,21 @@ export default class IdeasContainer extends Component {
       .catch(err => console.log(err));
   };
 
+  enableEditing = id => {
+    this.setState({ editingIdeaId: id },
+      () => { this.title.focus()}
+    );
+  };
+
   updateIdea = idea => {
     const ideaIndex = this.state.ideas.findIndex(x => x.id === idea.id);
     const ideas = update(this.state.ideas, { [ideaIndex]: { $set: idea } });
     this.setState({ ideas, notification: 'All changes saved' });
   };
+
+  deleteIdea = (id) => {
+    
+  }
 
   resetNotification = () => {
     this.setState({ notification: '' });
@@ -52,11 +62,12 @@ export default class IdeasContainer extends Component {
             idea={idea}
             key={idea.id}
             updateIdea={this.updateIdea}
+            titleRef={input => this.title = input}
             resetNotification={this.resetNotification}
           />
         );
       }
-      return <Idea idea={idea} key={idea.id} />;
+      return <Idea idea={idea} key={idea.id} enableEditing={this.enableEditing} />;
     });
     return (
       <div>
